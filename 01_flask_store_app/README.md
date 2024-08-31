@@ -52,3 +52,8 @@ python -m venv .venv source .venv/bin/activate # On Windows use .venv\Scripts\ac
 pip install flask
 flask run
 ```
+
+## Play & Test with rest clients
+
+*  Insomnia
+*  Postman
