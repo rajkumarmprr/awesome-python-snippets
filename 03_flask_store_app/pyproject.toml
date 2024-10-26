@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "flask store app v3"
+version = "0.1.0"
+description = "The flask store app version 3"
+authors = ["Rajkumar Manoharan <rajkumarmprr@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+flask = "^3.0.3"
+flask-smorest = "^0.44.0"
+python-dotenv = "^1.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+pytest-mock = "^3.14.0"
+coverage = "^7.6.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
