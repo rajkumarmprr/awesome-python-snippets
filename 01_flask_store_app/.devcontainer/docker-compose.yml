@@ -1,0 +1,13 @@
+services:
+  devcontainer:
+    image: rajkumarmprr/01-flask-store-app-devcontainer:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VARIANT: 3.12-bookworm
+        POETRY_VERSION: 1.8.4
+    init: true
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
