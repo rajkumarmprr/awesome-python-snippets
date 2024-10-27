@@ -1,4 +1,4 @@
-Store REST API APP v3
+Store REST API APP v2
 
 ## How to Run
 
