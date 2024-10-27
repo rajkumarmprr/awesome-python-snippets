@@ -1,9 +1,9 @@
-import uuid
-from flask import request
 from flask.views import MethodView
 from flask_smorest  import Blueprint, abort
-from db import items
 from schema import ItemSchema, ItemUpdateSchema
+from db import db
+from models import ItemModel
+from sqlalchemy.exc import SQLAlchemyError
 
 blp = Blueprint("Items", __name__, description="Operations on Items")
 
@@ -12,28 +12,25 @@ class ItemsControllerOne(MethodView):
 
   @blp.response(200, ItemSchema)
   def get(self, item_id):
-    try:
-      return items[item_id]
-    except KeyError:
-      abort(404, message="Item not found.")
+      item = ItemModel.query.get_or_404(item_id)
+      return item
 
   @blp.arguments(ItemUpdateSchema)
   @blp.response(200, ItemSchema)
   def update(self, item_data, item_id):
-    item = None
-    try:
-      item = items[item_id]
-    except KeyError:
-      abort(400, message="Item not found.")
-    item |= item_data
+    item = ItemModel.query.get_or_404(item_id)
+    item.name = item_data.get("name")
+    item.price = item_data.get("price")
+    db.session.add(item)
+    db.session.commit()
     return item, 200
 
   def delete(self, item_id):
-    try:
-      del items[item_id]
-      return {"message":"Item deleted"}, 200
-    except KeyError:
-      abort(404, message="Item not found.")
+    item = ItemModel.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    return {"message":"Item deleted"}, 200
+
 
 
 @blp.route("/item")
@@ -41,15 +38,18 @@ class ItemsControllerTwo(MethodView):
 
   @blp.response(200, ItemSchema(many=True))
   def get(self):
-    return items.values()
+    return ItemModel.query.all()
 
   @blp.arguments(ItemSchema)
   @blp.response(201, ItemSchema)
   def post(self, item_data):
-    for item in items.values():
-      if item["name"] == item_data['name']:
-        abort(409, message="The item already exists.")
-    item_id = uuid.uuid4().hex
-    item = {**item_data, "id":item_id}
-    items[item_id] = item
+    item = None
+    try:
+      item = ItemModel(**item_data)
+      db.session.add(item)
+      db.session.commit()
+    except SQLAlchemyError as e:
+      abort(500, message="Error occoured while insert item data")
+    except Exception as e:
+      print(e)
     return item
